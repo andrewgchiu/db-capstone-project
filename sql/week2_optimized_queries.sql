@@ -9,7 +9,7 @@ CALL GetMaxQuantity();
 -- Task 2
 -- Create a prepared statement GetOrderDetail with one input argument CustomerID
 
-PREPARE GetOrderDetail 'SELECT OrderID, Quantity, TotalCost FROM Orders WHERE CustomerID = ?';
+PREPARE GetOrderDetail FROM 'SELECT OrderID, Quantity, TotalCost FROM Orders WHERE CustomerID = ?';
 
 SET @id = 1;
 EXECUTE GetOrderDetail USING @id;

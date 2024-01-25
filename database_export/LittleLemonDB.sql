@@ -28,16 +28,11 @@ CREATE TABLE `bookings` (
   `TableNumber` int NOT NULL,
   `CustomerID` int NOT NULL,
   `StaffID` int NOT NULL,
-  `customers_CustomerID` int NOT NULL,
-  `customers_FirstName` varchar(45) NOT NULL,
-  `staff_StaffID` int NOT NULL,
-  `customers_CustomerID1` int NOT NULL,
-  `customers_FirstName1` varchar(45) NOT NULL,
   PRIMARY KEY (`BookingID`),
-  KEY `fk_bookings_staff1_idx` (`staff_StaffID`),
-  KEY `fk_bookings_customers2_idx` (`customers_CustomerID1`,`customers_FirstName1`),
-  CONSTRAINT `fk_bookings_customers2` FOREIGN KEY (`customers_CustomerID1`, `customers_FirstName1`) REFERENCES `customers` (`CustomerID`, `FullName`),
-  CONSTRAINT `fk_bookings_staff1` FOREIGN KEY (`staff_StaffID`) REFERENCES `staff` (`StaffID`)
+  KEY `fk_bookings_staff1_idx` (`StaffID`),
+  KEY `fk_bookings_customers2_idx` (`CustomerID`),
+  CONSTRAINT `fk_bookings_customers2` FOREIGN KEY (`CustomerID`) REFERENCES `customers` (`CustomerID`),
+  CONSTRAINT `fk_bookings_staff1` FOREIGN KEY (`StaffID`) REFERENCES `staff` (`StaffID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -112,7 +107,9 @@ CREATE TABLE `menus` (
   `MenuItemsID` int NOT NULL,
   `MenuName` varchar(45) DEFAULT NULL,
   `Cuisine` varchar(45) NOT NULL,
-  PRIMARY KEY (`MenuID`)
+  PRIMARY KEY (`MenuID`),
+  KEY `fk_menus_menuitems1_idx` (`MenuItemsID`),
+  CONSTRAINT `fk_menus_menuitems1` FOREIGN KEY (`MenuItemsID`) REFERENCES `menuitems` (`MenuItemsID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -123,33 +120,6 @@ CREATE TABLE `menus` (
 LOCK TABLES `menus` WRITE;
 /*!40000 ALTER TABLE `menus` DISABLE KEYS */;
 /*!40000 ALTER TABLE `menus` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `menus_has_menuitems`
---
-
-DROP TABLE IF EXISTS `menus_has_menuitems`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `menus_has_menuitems` (
-  `menus_MenuID` int NOT NULL,
-  `menuitems_MenuItemsID` int NOT NULL,
-  PRIMARY KEY (`menus_MenuID`,`menuitems_MenuItemsID`),
-  KEY `fk_menus_has_menuitems_menuitems1_idx` (`menuitems_MenuItemsID`),
-  KEY `fk_menus_has_menuitems_menus1_idx` (`menus_MenuID`),
-  CONSTRAINT `fk_menus_has_menuitems_menuitems1` FOREIGN KEY (`menuitems_MenuItemsID`) REFERENCES `menuitems` (`MenuItemsID`),
-  CONSTRAINT `fk_menus_has_menuitems_menus1` FOREIGN KEY (`menus_MenuID`) REFERENCES `menus` (`MenuID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `menus_has_menuitems`
---
-
-LOCK TABLES `menus_has_menuitems` WRITE;
-/*!40000 ALTER TABLE `menus_has_menuitems` DISABLE KEYS */;
-/*!40000 ALTER TABLE `menus_has_menuitems` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -164,7 +134,9 @@ CREATE TABLE `orderdeliverystatus` (
   `OrderID` int DEFAULT NULL,
   `DeliveryDate` date NOT NULL,
   `Status` varchar(45) NOT NULL,
-  PRIMARY KEY (`OrderDeliveryID`)
+  PRIMARY KEY (`OrderDeliveryID`),
+  KEY `fk_orderdeliverystatus_orders1_idx` (`OrderID`),
+  CONSTRAINT `fk_orderdeliverystatus_orders1` FOREIGN KEY (`OrderID`) REFERENCES `orders` (`OrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -192,12 +164,11 @@ CREATE TABLE `orders` (
   `CustomerID` int NOT NULL,
   `StaffID` int NOT NULL,
   `MenuID` int NOT NULL,
-  `orderdeliverystatus_OrderDeliveryID` int NOT NULL,
   PRIMARY KEY (`OrderID`),
   KEY `fk_orders_customers1_idx` (`CustomerID`),
-  KEY `fk_orders_orderdeliverystatus1_idx` (`orderdeliverystatus_OrderDeliveryID`),
+  KEY `fk_orders_menus1_idx` (`MenuID`),
   CONSTRAINT `fk_orders_customers1` FOREIGN KEY (`CustomerID`) REFERENCES `customers` (`CustomerID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_orders_orderdeliverystatus1` FOREIGN KEY (`orderdeliverystatus_OrderDeliveryID`) REFERENCES `orderdeliverystatus` (`OrderDeliveryID`)
+  CONSTRAINT `fk_orders_menus1` FOREIGN KEY (`MenuID`) REFERENCES `menus` (`MenuID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -208,33 +179,6 @@ CREATE TABLE `orders` (
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `orders_has_menus`
---
-
-DROP TABLE IF EXISTS `orders_has_menus`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `orders_has_menus` (
-  `orders_OrderID` int NOT NULL,
-  `menus_MenuID` int NOT NULL,
-  PRIMARY KEY (`orders_OrderID`,`menus_MenuID`),
-  KEY `fk_orders_has_menus_menus1_idx` (`menus_MenuID`),
-  KEY `fk_orders_has_menus_orders1_idx` (`orders_OrderID`),
-  CONSTRAINT `fk_orders_has_menus_menus1` FOREIGN KEY (`menus_MenuID`) REFERENCES `menus` (`MenuID`),
-  CONSTRAINT `fk_orders_has_menus_orders1` FOREIGN KEY (`orders_OrderID`) REFERENCES `orders` (`OrderID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `orders_has_menus`
---
-
-LOCK TABLES `orders_has_menus` WRITE;
-/*!40000 ALTER TABLE `orders_has_menus` DISABLE KEYS */;
-/*!40000 ALTER TABLE `orders_has_menus` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -272,4 +216,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-01-24 19:41:43
+-- Dump completed on 2024-01-25 12:24:07
